@@ -1,4 +1,4 @@
-FROM ghcr.io/actions/actions-runner:2.304.0
+FROM ghcr.io/actions/actions-runner:2.319.1
 # for latest release, see https://github.com/actions/runner/releases
 
 USER root
@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y curl jq && \
     rm -rf /var/lib/apt/lists/*
 
 COPY github-actions-runner/entrypoint.sh ./entrypoint.sh
+COPY self-hosted-azure-runner-dev.2024-09-30.private-key.pem ./private-key.pem
+
 RUN chmod +x ./entrypoint.sh
 
 USER runner
