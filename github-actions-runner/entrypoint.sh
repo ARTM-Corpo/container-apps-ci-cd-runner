@@ -34,7 +34,6 @@ if [ -n "${GITHUB_APP_ID}" ] && [ -n "${GITHUB_APP_INSTALLATION_ID}" ]; then
   }
 
   jwt_payload=$(build_jwt_payload)
-  echo "JWT payload: ${jwt_payload}"
   encoded_jwt_parts=$(base64url <<<"${JWT_JOSE_HEADER}").$(base64url <<<"${jwt_payload}")
   encoded_mac=$(echo -n "${encoded_jwt_parts}" | rs256_sign "$(cat ./private-key.pem)" | base64url)
   generated_jwt="${encoded_jwt_parts}.${encoded_mac}"
@@ -55,7 +54,6 @@ if [ -n "${GITHUB_APP_ID}" ] && [ -n "${GITHUB_APP_INSTALLATION_ID}" ]; then
     exit 1
   else
     echo "Github App access token acquired"
-    echo "Access token: ${access_token}"
 
     FULL_URL="${URI}/repos/${GH_URL}/actions/runners/registration-token"
     echo "Registering runner for repository: ${GH_URL}"
@@ -67,7 +65,6 @@ if [ -n "${GITHUB_APP_ID}" ] && [ -n "${GITHUB_APP_INSTALLATION_ID}" ]; then
       "${FULL_URL}" \
       | jq -r '.token')"
 
-    echo "Registration token: ${REGISTRATION_TOKEN}"
     echo "Full URL: ${FULL_URL}"
 
     if [ -z "${REGISTRATION_TOKEN}" ]; then
@@ -82,4 +79,4 @@ else
   exit 1
 fi
 
-./config.sh --url "https://github.com/ARTM-Corpo" --runnergroup Default --token $REGISTRATION_TOKEN --work /home/builder/actions-runner/runner --labels self-hosted,Linux,X64 --unattended && ./run.sh 
+./config.sh --url "https://github.com/${GH_URL}" --token $REGISTRATION_TOKEN --unattended --ephemeral && ./run.sh 
